@@ -18,11 +18,19 @@ COPY . .
 RUN cd src/ && go build -o main .
 
 # Устанавливаем переменные окружения для подключения к базе данных
-ENV DB_HOST=localhost \
-    DB_PORT='8080' \
-    DB_USER=postgres \
-    DB_PASSWORD=password \
-    DB_NAME=test
+ARG DB_HOST
+ARG DB_PORT
+ARG DB_USER
+ARG DB_PASSWORD
+ARG DB_NAME
+
+ENV DB_HOST=$DB_HOST \
+    DB_PORT=$DB_PORT \
+    DB_USER=$DB_USER \
+    DB_PASSWORD=$DB_PASSWORD \
+    DB_NAME=$DB_NAME
+
+EXPOSE 5000
 
 # Запускаем приложение
 CMD ["src/main"]
