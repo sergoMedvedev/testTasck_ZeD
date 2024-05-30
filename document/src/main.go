@@ -1,13 +1,14 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	postgres "github.com/jackc/pgx"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 )
 
 type settings struct {
@@ -20,7 +21,7 @@ type settings struct {
 
 var s *settings = settingsLoad()
 
-//var db *sql.DB = createConnectionDB(s)
+var db *postgres.Conn = createConnectionDB(s)
 
 func main() {
 
@@ -75,19 +76,24 @@ func extractFileMetadata(fileHeader *multipart.FileHeader) (string, string) {
 	return filename, extension
 }
 
-func createConnectionDB(s *settings) *sql.DB {
-	fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		s.host, s.port, s.user, s.password, s.dbname)
+func createConnectionDB(s *settings) *postgres.Conn {
 
-	db, err := sql.Open("postgres", s.dbname)
-	if err != nil {
-		panic("data base connection failed")
+	portInt, _ := strconv.Atoi(s.port)
+
+	confDB := postgres.ConnConfig{
+		Host:     s.host,
+		Port:     uint16(portInt),
+		Database: s.dbname,
+		User:     s.user,
+		Password: s.password,
 	}
-	defer db.Close()
 
-	fmt.Sprintf("connecting to database %s", s.dbname)
+	cfg, err := postgres.Connect(confDB)
+	if err != nil {
+		panic("Unable to connect to database")
+	}
 
-	return db
+	return cfg
 }
 
 //func createMetadata(filename string, extension string) {
