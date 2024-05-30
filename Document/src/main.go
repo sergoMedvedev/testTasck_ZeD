@@ -12,7 +12,7 @@ import (
 
 type settings struct {
 	host     string
-	port     int
+	port     string
 	user     string
 	password string
 	dbname   string
@@ -30,11 +30,11 @@ func main() {
 
 func settingsLoad() *settings {
 	return &settings{
-		host:     "localhost",
+		host:     os.Getenv("DB-HOST"),
 		port:     os.Getenv("DB_PORT"),
-		user:     "postgres",
-		password: "password",
-		dbname:   "test",
+		user:     os.Getenv("DB_USER"),
+		password: os.Getenv("DB_PASSWORD"),
+		dbname:   os.Getenv("DB_NAME"),
 	}
 }
 

@@ -5,7 +5,8 @@ FROM golang:1.18 AS builder
 WORKDIR /app
 
 # Копируем go.mod и go.sum, чтобы скачать зависимости
-COPY go.mod go.sum ./
+COPY ./document/go.mod ./
+
 
 # Загружаем зависимости
 RUN go mod download
@@ -30,7 +31,7 @@ COPY --from=builder /app/main .
 
 # Устанавливаем переменные окружения для подключения к базе данных
 ENV DB_HOST=localhost \
-    DB_PORT=8080 \
+    DB_PORT='8080' \
     DB_USER=postgres \
     DB_PASSWORD=password \
     DB_NAME=test
