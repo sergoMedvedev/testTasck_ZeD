@@ -19,7 +19,8 @@ type settings struct {
 }
 
 var s *settings = settingsLoad()
-var db *sql.DB = createConnectionDB(s)
+
+//var db *sql.DB = createConnectionDB(s)
 
 func main() {
 
@@ -60,8 +61,8 @@ func loadFile(c *gin.Context) {
 		defer file.Close()
 
 		filename, extension := extractFileMetadata(fileHeader)
-
-		createMetadata(filename, extension)
+		fmt.Sprintf("%s, %s", filename, extension)
+		//createMetadata(filename, extension)
 
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Files uploaded successfully"})
@@ -89,13 +90,13 @@ func createConnectionDB(s *settings) *sql.DB {
 	return db
 }
 
-func createMetadata(filename string, extension string) {
-	sqlStatement := `
-        INSERT INTO documents_metadata (filename, extension)
-        VALUES ($1, $2)`
-
-	_, err := db.Exec(sqlStatement, filename, extension)
-	if err != nil {
-		panic("Error inserting entry")
-	}
-}
+//func createMetadata(filename string, extension string) {
+//	sqlStatement := `
+//        INSERT INTO documents_metadata (filename, extension)
+//        VALUES ($1, $2)`
+//
+//	_, err := db.Exec(sqlStatement, filename, extension)
+//	if err != nil {
+//		panic("Error inserting entry")
+//	}
+//}

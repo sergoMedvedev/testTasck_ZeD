@@ -1,8 +1,7 @@
 version: '3.8'
 
 services:
-  db:
-    container_name: db
+  db_postgresql:
     image: postgres:12
     restart: always
     environment:
@@ -18,7 +17,7 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - db
+      - db_postgresql
     environment:
       DB_HOST: ${DB_HOST}
       DB_PORT: ${POSTGRES_PORT}

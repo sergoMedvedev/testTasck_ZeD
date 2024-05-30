@@ -1,12 +1,12 @@
 # Используем официальный образ Go для сборки приложения
 FROM golang:1.18 AS builder
 
+ENV GOPATH=/temp/gopath
 # Устанавливаем рабочую директорию внутри контейнера
-WORKDIR /app
+WORKDIR .
 
 # Копируем go.mod и go.sum, чтобы скачать зависимости
-COPY ./document/go.mod ./
-
+COPY go.mod go.sum ./
 
 # Загружаем зависимости
 RUN go mod download
@@ -15,19 +15,7 @@ RUN go mod download
 COPY . .
 
 # Собираем Go приложение
-RUN go build -o main .
-
-# Используем минимальный образ для запуска приложения
-FROM alpine:latest
-
-# Устанавливаем необходимые зависимости
-RUN apk --no-cache add ca-certificates
-
-# Устанавливаем рабочую директорию внутри контейнера
-WORKDIR /root/
-
-# Копируем собранное приложение из контейнера builder
-COPY --from=builder /app/main .
+RUN cd src/ && go build -o main .
 
 # Устанавливаем переменные окружения для подключения к базе данных
 ENV DB_HOST=localhost \
@@ -37,4 +25,4 @@ ENV DB_HOST=localhost \
     DB_NAME=test
 
 # Запускаем приложение
-CMD ["./main"]
+CMD ["src/main"]
