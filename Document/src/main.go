@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"mime/multipart"
 	"net/http"
+	"path/filepath"
 )
 
 type settings struct {
@@ -54,8 +56,21 @@ func loadFile(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to open file"})
 			return
 		}
+		defer file.Close()
+
+		filename, extension := extractFileMetadata(fileHeader)
+
+		createMetadata(filename, extension)
 
 	}
+	c.JSON(http.StatusOK, gin.H{"message": "Files uploaded successfully"})
+
+}
+
+func extractFileMetadata(fileHeader *multipart.FileHeader) (string, string) {
+	filename := fileHeader.Filename
+	extension := filepath.Ext(filename)
+	return filename, extension
 }
 
 func createConnectionDB(s *settings) *sql.DB {
@@ -73,11 +88,12 @@ func createConnectionDB(s *settings) *sql.DB {
 	return db
 }
 
-func createEntry(filename string, extension string) {
+func createMetadata(filename string, extension string) {
 	sqlStatement := `
         INSERT INTO documents_metadata (filename, extension)
         VALUES ($1, $2)`
-	_, err = db.Exec(sqlStatement, filename, extension)
+
+	_, err := db.Exec(sqlStatement, filename, extension)
 	if err != nil {
 		panic("Error inserting entry")
 	}
