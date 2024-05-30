@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"mime/multipart"
 	"net/http"
+	"os"
 	"path/filepath"
 )
 
@@ -30,7 +31,7 @@ func main() {
 func settingsLoad() *settings {
 	return &settings{
 		host:     "localhost",
-		port:     8080,
+		port:     os.Getenv("DB_PORT"),
 		user:     "postgres",
 		password: "password",
 		dbname:   "test",
